@@ -1,0 +1,70 @@
+const fetch = require('node-fetch');
+var Database = require('../Utilities/Database.js');
+const Discord = require('discord.js');
+let Roblox = require('./../Utilities/Roblox.js')
+
+module.exports = {
+    name: 'update',
+    description: 'Update Guild Roles',
+    guildOnly: true,
+    execute: async(message, args) => {
+        let embed = new Discord.RichEmbed()
+        .setTitle('Update Process')
+        .setTimestamp()
+        .setFooter('tensor_core');
+        //if (message.member.permissions.has('ADMINISTRATOR')) return;
+        let arg = message.guild.member(message.mentions.users.first()) || message.member;
+        let roles = arg.roles;
+        let User = await Database.GetUser(arg.id);
+        console.log(User);
+        let Group = await Database.GetGroup(message.guild.id);
+        let Remove = Group['AllBinds'];
+        let Subgroups = Group.Subgroups
+        if(User) {
+            let Rank = await Roblox.GetGroupRank(User.RobloxId, Group.GroupId);
+            if (Rank > 0) {
+                let Bind = Group.RankBinds[Rank];
+                if (!Bind) {
+                    return;
+                }
+                for (let i = 0; i < Remove.length; i++ ) {
+                    console.log(Remove[i])
+                    if (Bind.RoleBinds.includes(Remove[i])) {
+                        if (!roles.has(Remove[i])) 
+                            await arg.addRole(Remove[i]).catch(err => console.log(err));
+                    } else {
+                        if (roles.has(Remove[i])) 
+                            await arg.removeRole(Remove[i]).catch(err => console.log(err));
+                    }
+                }
+                let Username = await Roblox.GetRobloxName(User.RobloxId);
+                await arg.setNickname(Bind.Nickname + ' ' + Username).catch(err => console.log(err)); 
+                console.log(Group.VerificationRole)
+                await arg.removeRole(Group.VerificationRole).catch(err => console.log(err));
+            } else {
+                await arg.removeRoles(Remove).catch(err => console.log(err));
+                await arg.addRole(Group.VerificationRole);
+            }
+
+            setTimeout(async function () {
+                for (const key in Subgroups) {
+                    if (Subgroups.hasOwnProperty(key)) {
+                        const Subgroup = Subgroups[key];
+                        let SubRank = await Roblox.GetGroupRank(User.RobloxId, key);
+                        if(SubRank != 0) {
+                            if (!roles.has(Subgroup))
+                                await arg.addRole(Subgroup).catch(err => console.log(err));
+                        } else {
+                            if (roles.has(Subgroup)) {
+                                await arg.removeRole(Subgroup);
+                            }
+                        }
+                    }
+                }     
+            }, 500);
+        } else {
+            await arg.removeRoles(Remove).catch(err => console.log(err));
+            await arg.addRole(Group.VerificationRole);
+        }
+    }
+}    

@@ -1,7 +1,7 @@
 var express = require("express");
 var app = express();
-var cfenv = require("cfenv");
 var bodyParser = require('body-parser')
+var fs = require('fs')
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -9,110 +9,125 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-var cloudant, mydb;
-
-/* Endpoint to greet and add a new visitor to database.
-* Send a POST request to localhost:3000/api/visitors with body
-* {
-* 	"name": "Bob"
-* }
-*/
-app.post("/api/visitors", function (request, response) {
-  var userName = request.body.name;
-  var doc = { "name" : userName };
-  if(!mydb) {
-    console.log("No database.");
-    response.send(doc);
-    return;
-  }
-  // insert the username as a document
-  mydb.insert(doc, function(err, body, header) {
-    if (err) {
-      console.log('[mydb.insert] ', err.message);
-      response.send("Error");
-      return;
-    }
-    doc._id = body.id;
-    response.send(doc);
-  });
-});
-
-/**
- * Endpoint to get a JSON array of all the visitors in the database
- * REST API example:
- * <code>
- * GET http://localhost:3000/api/visitors
- * </code>
- *
- * Response:
- * [ "Bob", "Jane" ]
- * @return An array of all the visitor names
- */
-app.get("/api/visitors", function (request, response) {
-  var names = [];
-  if(!mydb) {
-    response.json(names);
-    return;
-  }
-
-  mydb.list({ include_docs: true }, function(err, body) {
-    if (!err) {
-      body.rows.forEach(function(row) {
-        if(row.doc.name)
-          names.push(row.doc.name);
-      });
-      response.json(names);
-    }
-  });
-});
-
-
-// load local VCAP configuration  and service credentials
-var vcapLocal;
-try {
-  vcapLocal = require('./vcap-local.json');
-  console.log("Loaded local VCAP", vcapLocal);
-} catch (e) { }
-
-const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
-
-const appEnv = cfenv.getAppEnv(appEnvOpts);
-
-// Load the Cloudant library.
-var Cloudant = require('@cloudant/cloudant');
-if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
-
-  // Initialize database with credentials
-  if (appEnv.services['cloudantNoSQLDB']) {
-    // CF service named 'cloudantNoSQLDB'
-    cloudant = Cloudant(appEnv.services['cloudantNoSQLDB'][0].credentials);
-  } else {
-     // user-provided service with 'cloudant' in its name
-     cloudant = Cloudant(appEnv.getService(/cloudant/).credentials);
-  }
-} else if (process.env.CLOUDANT_URL){
-  cloudant = Cloudant(process.env.CLOUDANT_URL);
-}
-if(cloudant) {
-  //database name
-  var dbName = 'mydb';
-
-  // Create a new "mydb" database.
-  cloudant.db.create(dbName, function(err, data) {
-    if(!err) //err if database doesn't already exists
-      console.log("Created database: " + dbName);
-  });
-
-  // Specify the database we are going to use (mydb)...
-  mydb = cloudant.db.use(dbName);
-}
-
 //serve static file (index.html, images, css)
 app.use(express.static(__dirname + '/views'));
 
-
-
-var port = process.env.PORT || 3000
+var port = process.env.PORT || 3333
 app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
 });
+
+//Starting discord bot
+var Discord = require('discord.js');
+var { prefix, token } = require('./config.json');
+
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
+
+const commandFiles = fs.readdirSync('./Commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const command = require(`./Commands/${file}`);
+  client.commands.set(command.name, command);
+}
+
+var Database = require('./Utilities/Database.js');
+var Roblox = require('./Utilities/Roblox')
+
+client.once('ready', async function () {
+  console.log('Ready');
+  setInterval(async function() {
+        let guilds = client.guilds;
+        for (let guild of guilds) {
+            let Group = await Database.GetGroup(guild[1].id);
+            let Subgroups = Group.Subgroups;
+            let Remove = Group['AllBinds'];
+            if (!Group.AutoDetection) {
+                continue;
+            }
+            for (let member of guild[1].members) {
+                if (member[1].user.bot || member[1].roles.has(guild[1].roles.find(r => r.name === "tensor_core Bypass").id)) {
+                    continue;
+                }
+                let arg = member[1];
+                let roles = arg.roles;
+                console.log(arg.id);
+                let User = await Database.GetUser(arg.id);
+                console.log(User);
+                if(User) {
+                    let Rank = await Roblox.GetGroupRank(User.RobloxId, Group.GroupId);
+                    if (Rank > 0) {
+                        let Bind = Group.RankBinds[Rank];
+                        if (!Bind) {
+                            return;
+                        }
+                        for (let i = 0; i < Remove.length; i++ ) {
+                            console.log(Remove[i])
+                            if (Bind.RoleBinds.includes(Remove[i])) {
+                                if (!roles.has(Remove[i])) 
+                                    await arg.addRole(Remove[i]).catch(err => console.log(err));
+                            } else {
+                                if (roles.has(Remove[i])) 
+                                    await arg.removeRole(Remove[i]).catch(err => console.log(err));
+                            }
+                        }
+                        let Username = await Roblox.GetRobloxName(User.RobloxId);
+                        await arg.setNickname(Bind.Nickname + ' ' + Username).catch(err => console.log(err)); 
+                        console.log(Group.VerificationRole)
+                        await arg.removeRole(Group.VerificationRole).catch(err => console.log(err));
+                    } else {
+                        await arg.removeRoles(Remove).catch(err => console.log(err));
+                        await arg.addRole(Group.VerificationRole);
+                    }
+        
+                    setTimeout(async function () {
+                        for (const key in Subgroups) {
+                            if (Subgroups.hasOwnProperty(key)) {
+                                const Subgroup = Subgroups[key];
+                                let SubRank = await Roblox.GetGroupRank(User.RobloxId, key);
+                                if(SubRank != 0) {
+                                    if (!roles.has(Subgroup))
+                                        await arg.addRole(Subgroup).catch(err => console.log(err));
+                                } else {
+                                    if (roles.has(Subgroup)) {
+                                        await arg.removeRole(Subgroup);
+                                    }
+                                }
+                            }
+                        }     
+                    }, 500);
+                } else {
+                    await arg.removeRoles(Remove).catch(err => console.log(err));
+                    await arg.addRole(Group.VerificationRole);
+                }
+            }
+        }
+  }, 30*60*1000);
+})
+
+client.on('message', message => {
+  if (message.author.bot) return;
+  if (!message.content.startsWith(prefix)) return;
+
+  const args = message.content.slice(prefix.length).split(/ +/);
+  const commandName = args.shift().toLowerCase();
+
+  if (!client.commands.has(commandName)) return;
+  const command = client.commands.get(commandName);
+
+  if(command.guildOnly && !(message.channel.type === 'text')) {
+      message.reply('This command may only be executed in a server/guild.');
+      return;
+  }
+
+  try {
+      command.execute(message, args, client);
+  }
+  catch (error) {
+      console.error(error);
+      message.reply('There was an error trying to execute that command!');
+  }
+});
+
+
+client.login(token);

@@ -18,8 +18,10 @@
     "@cloudant/cloudant": "^2.3.0",
     "body-parser": "^1.17.x",
     "cfenv": "^1.0.x",
+    "discord.js": "^11.4.2",
     "dotenv": "^4.0.0",
-    "express": "^4.15.x"
+    "express": "^4.15.x",
+    "node-fetch": "^2.3.0"
   },
   "author": "IBM Corp",
   "license": "Apache-2.0"
