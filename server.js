@@ -34,9 +34,8 @@ for (const file of commandFiles) {
 var Database = require('./Utilities/Database.js');
 var Roblox = require('./Utilities/Roblox')
 
-client.once('ready', async function () {
-  console.log('Ready');
-  setInterval(async function() {
+async function AutoDetection() {
+    setInterval(async function() {
         let guilds = client.guilds;
         for (let guild of guilds) {
             let Group = await Database.GetGroup(guild[1].id);
@@ -103,7 +102,12 @@ client.once('ready', async function () {
             }
         }
   }, 30*60*1000);
-})
+}
+
+client.once('ready', async function () {
+  console.log('Ready');
+  await AutoDetection();      
+});
 
 client.on('message', message => {
   if (message.author.bot) return;
