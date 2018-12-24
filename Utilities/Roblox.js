@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+var rbx = require('noblox.js');
 
 async function GetGroupRank(RobloxId, GroupId) {
     let response = await fetch(`https://assetgame.roblox.com/Game/LuaWebService/HandleSocialRequest.ashx?method=GetGroupRank&playerid=${RobloxId}&groupid=${GroupId}`).then(); 
@@ -32,4 +33,11 @@ async function GetRobloxName(userId) {
     return data.Username;
 }
 
-module.exports = {GetGroupRank, GetRobloxId, CheckForCode, GetRobloxName}
+async function GetGroupRole(RobloxId, GroupId) {
+    let response = await fetch(`https://assetgame.roblox.com/Game/LuaWebService/HandleSocialRequest.ashx?method=GetGroupRole&playerid=${RobloxId}&groupid=${GroupId}`).then(); 
+    if (response.status != 200) {return false;}
+    let data = await response.text();
+    return data;     
+}
+
+module.exports = {GetGroupRank, GetRobloxId, CheckForCode, GetRobloxName, GetGroupRole}

@@ -34,6 +34,7 @@ for (const file of commandFiles) {
 var Database = require('./Utilities/Database.js');
 var Roblox = require('./Utilities/Roblox')
 
+
 async function AutoDetection() {
     setInterval(async function() {
         let guilds = client.guilds;
