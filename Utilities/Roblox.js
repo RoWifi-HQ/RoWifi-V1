@@ -1,5 +1,10 @@
 const fetch = require('node-fetch');
 var rbx = require('noblox.js');
+var { cookie } = require('./../config.json')
+
+rbx.cookieLogin({cookie: cookie})
+.then(() => console.log('Logged into Roblox Account'))
+.catch(err => console.log(err.stack));
 
 async function GetGroupRank(RobloxId, GroupId) {
     let response = await fetch(`https://assetgame.roblox.com/Game/LuaWebService/HandleSocialRequest.ashx?method=GetGroupRank&playerid=${RobloxId}&groupid=${GroupId}`).then(); 

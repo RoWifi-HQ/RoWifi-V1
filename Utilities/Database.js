@@ -36,7 +36,7 @@ if(cloudant) {
 
 function GetUser(DiscordId) {
     return new Promise(function(resolve, reject) {
-        users.get(DiscordId, function(err, body) {
+        users.get(DiscordId, (err, body) => {
             if (err) {
                 //console.log(err);
                 resolve(false);
@@ -83,4 +83,25 @@ async function AddUsers(Ids) {
     })
 }
 
-module.exports = {GetUser, GetGroup, AddUser, AddUsers}
+async function GetWebhook(GroupId, key) {
+    const q = {
+        "selector": {
+           "GroupId": parseInt(GroupId)
+        },
+        "fields": ["GroupId","Webhooks"]
+     }
+    return new Promise(function(resolve, reject) {
+        guilds.find(q, function (err, body) {
+            if (err) {
+                resolve(false)
+            }
+            console.log(body);
+            if (!body.docs) {
+               resolve(false); 
+            }
+            resolve(body.docs[0].Webhooks[key]);
+        })
+    })
+}
+
+module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook}

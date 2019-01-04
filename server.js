@@ -2,6 +2,12 @@ var express = require("express");
 var app = express();
 var bodyParser = require('body-parser')
 var fs = require('fs')
+var Database = require('./Utilities/Database.js');
+var Roblox = require('./Utilities/Roblox')
+var fetch = require('node-fetch')
+var rbx = require('noblox.js');
+var Discord = require('discord.js');
+var { prefix, token, cookie } = require('./config.json');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -12,15 +18,44 @@ app.use(bodyParser.json())
 //serve static file (index.html, images, css)
 app.use(express.static(__dirname + '/views'));
 
+app.post("/api/v1/webhook", async function (request, response) {
+    let body = request.body;
+    if (!body.group) {
+        return response.status(400).send({
+            success: 'false',
+            message: "Group Required"
+        })
+    }
+    if (!body.key) {
+        return response.status(400).send({
+            success: 'false',
+            message: "Discord Webhook Key Required"
+        })
+    }
+    if (!body.message) {
+        return response.status(400).send({
+            success: 'false',
+            message: "Cannot send an empty message"
+        }) 
+    }
+    let Webhook = await Database.GetWebhook(body.group, body.key);
+    if (!Webhook) {
+        return response.status(400).send({
+            success: 'false',
+            message: "Webhook not found for given key"
+        }) 
+    }
+    console.log(Webhook);
+    let hook = new Discord.WebhookClient(Webhook.id, Webhook.token);
+    hook.send(body.message);
+})
+
 var port = process.env.PORT || 3333
 app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
 });
 
 //Starting discord bot
-var Discord = require('discord.js');
-var { prefix, token } = require('./config.json');
-
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
@@ -30,10 +65,6 @@ for (const file of commandFiles) {
   const command = require(`./Commands/${file}`);
   client.commands.set(command.name, command);
 }
-
-var Database = require('./Utilities/Database.js');
-var Roblox = require('./Utilities/Roblox')
-
 
 async function AutoDetection() {
     setInterval(async function() {
