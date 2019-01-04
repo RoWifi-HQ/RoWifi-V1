@@ -1,8 +1,11 @@
 const fetch = require('node-fetch');
 var rbx = require('noblox.js');
-var { cookie } = require('./../config.json')
+const fs = require('fs')
+const cookieFile = './../cookie'
+var json = JSON.parse(fs.readFileSync('./cookie'))
+console.log(json.cookie)
 
-rbx.cookieLogin({cookie: cookie})
+rbx.cookieLogin({cookie: json.cookie})
 .then(() => console.log('Logged into Roblox Account'))
 .catch(err => console.log(err.stack));
 
