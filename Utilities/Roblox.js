@@ -3,7 +3,6 @@ var rbx = require('noblox.js');
 const fs = require('fs')
 const cookieFile = './../cookie'
 var json = JSON.parse(fs.readFileSync('./cookie'))
-console.log(json.cookie)
 
 rbx.cookieLogin({cookie: json.cookie})
 .then(() => console.log('Logged into Roblox Account'))
