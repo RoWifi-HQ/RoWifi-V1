@@ -136,9 +136,18 @@ async function AutoDetection() {
   }, 30*60*1000);
 }
 
+let AuditLogs = require('./Modules/AAWatcher')
 client.once('ready', async function () {
-  console.log('Ready');
-  await AutoDetection();      
+    console.log('Ready');
+    await AutoDetection();
+    let guilds = client.guilds;
+    for (let guild of guilds) {
+        let Group = await Database.GetGroup(guild[1].id);
+        if (!Group) {
+            continue;
+        }
+        AuditLogs.WatchAA(guild[1]);
+    }
 });
 
 client.on('message', async function (message){

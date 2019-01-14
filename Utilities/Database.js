@@ -33,7 +33,10 @@ if(cloudant) {
     guilds = cloudant.db.use('guilds');
 }
 
-
+/**
+ * 
+ * @param {string} DiscordId User Discord Id
+ */
 function GetUser(DiscordId) {
     return new Promise(function(resolve, reject) {
         users.get(DiscordId, (err, body) => {
@@ -46,11 +49,14 @@ function GetUser(DiscordId) {
     })
 }
 
+/**
+ * 
+ * @param {string} GuildId Discord Guild Id 
+ */
 async function GetGroup(GuildId) {
     return new Promise(function(resolve, reject) {
         guilds.get(GuildId, function(err, body) {
             if(err) {
-                console.log(err);
                 resolve(false);
             }
             resolve(body);
