@@ -152,6 +152,7 @@ client.on('message', async function (message){
   let Group = await Database.GetGroup(message.guild.id);
   if (!Group) {
       message.reply('No Roblox Group is linked to this guild');
+      return;
   }
   const command = client.commands.get(commandName);
 
