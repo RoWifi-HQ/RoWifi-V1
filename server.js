@@ -149,6 +149,10 @@ client.on('message', message => {
   const commandName = args.shift().toLowerCase();
 
   if (!client.commands.has(commandName)) return;
+  let Group = await Database.GetGroup(message.guild.id);
+  if (!Group) {
+      message.reply('No Roblox Group is linked to this guild');
+  }
   const command = client.commands.get(commandName);
 
   if(command.guildOnly && !(message.channel.type === 'text')) {
