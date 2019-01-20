@@ -2,7 +2,7 @@ var Roblox = require('./../Utilities/Roblox')
 var Database = require('./../Utilities/Database')
 var rbx = require('noblox.js');
 var update = require('./update')
-var Discord = require('discord.js')
+var {Command} = require('discord.js-commando')
 
 function CheckPermission(member, PromoteMax) {
     if (member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
@@ -17,10 +17,17 @@ function CheckPermission(member, PromoteMax) {
     return false;
 }
 
-module.exports = {
-    name: 'promote',
-    description: 'Promotes user',
-    execute: async (message, args) => {
+module.exports = class PromoteCommand extends Command{
+    constructor(client) {
+        super(client, {
+            name: 'promote',
+            group: 'roblox',
+            memberName: 'promote',
+            description: 'Promotes a user in the Roblox Group',
+            guildOnly: false,
+        })
+    }        
+    async run(message, args) {
         let Group = await Database.GetGroup(message.guild.id);
         let MaxRank = CheckPermission(message.member, Group.PromoteMax);
         if (!MaxRank) {

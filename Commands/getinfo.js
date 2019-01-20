@@ -1,11 +1,18 @@
 var Roblox = require('./../Utilities/Roblox')
 var Database = require('./../Utilities/Database')
-const Discord = require('discord.js');
+const {Command} = require('discord.js-commando');
 
-module.exports = {
-    name: 'getinfo',
-    description: 'Get the informaation of the user',
-    execute: async(message, args, client) => {
+module.exports = class GetInfoCommand extends Command{
+    constructor(client) {
+        super(client, {
+            name: 'getinfo',
+            group: 'roblox',
+            memberName: 'getinfo',
+            description: 'Gets the Information regarding the user',
+            guildOnly: false,
+        })
+    }
+    async run (message) {
         let embed = new Discord.RichEmbed()
         .setTitle('[SAF] Swedish Armed Forces')
         .setTimestamp()
@@ -33,6 +40,6 @@ module.exports = {
         }
         string = (string == '') ? 'None' : string;
         embed.addField('Regiments', string);
-        message.channel.send('', {embed})
+        return message.embed(embed);
     }
 }

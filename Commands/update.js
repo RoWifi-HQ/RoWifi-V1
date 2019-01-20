@@ -1,13 +1,19 @@
 const fetch = require('node-fetch');
 var Database = require('../Utilities/Database.js');
-const Discord = require('discord.js');
+const {Command} = require('discord.js-commando');
 let Roblox = require('./../Utilities/Roblox.js')
 
-module.exports = {
-    name: 'update',
-    description: 'Update Guild Roles',
-    guildOnly: true,
-    execute: async(message, args) => {
+module.exports = class UpdateCommand extends Command {
+    constructor(client) {
+        super(client, {
+            name: 'update',
+            group: 'roblox',
+            memberName: 'update',
+            description: 'Update Guild Roles',
+            guildOnly: true
+        })
+    }        
+    async run(message){
         let embed = new Discord.RichEmbed()
         .setTitle('Update Process')
         .setTimestamp()

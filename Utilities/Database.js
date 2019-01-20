@@ -42,7 +42,7 @@ function GetUser(DiscordId) {
         users.get(DiscordId, (err, body) => {
             if (err) {
                 //console.log(err);
-                resolve(false);
+                resolve(null);
             }
             resolve(body);
         }); 

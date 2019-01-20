@@ -6,8 +6,9 @@ var Database = require('./Utilities/Database.js');
 var Roblox = require('./Utilities/Roblox')
 var fetch = require('node-fetch')
 var rbx = require('noblox.js');
-var Discord = require('discord.js');
-var { prefix, token, cookie } = require('./config.json');
+var Commando = require('discord.js-commando');
+var { prefix, token } = require('./config.json');
+var path = require('path');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -18,53 +19,16 @@ app.use(bodyParser.json())
 //serve static file (index.html, images, css)
 app.use(express.static(__dirname + '/views'));
 
-app.post("/api/v1/webhook", async function (request, response) {
-    let body = request.body;
-    if (!body.group) {
-        return response.status(400).send({
-            success: 'false',
-            message: "Group Required"
-        })
-    }
-    if (!body.key) {
-        return response.status(400).send({
-            success: 'false',
-            message: "Discord Webhook Key Required"
-        })
-    }
-    if (!body.message) {
-        return response.status(400).send({
-            success: 'false',
-            message: "Cannot send an empty message"
-        }) 
-    }
-    let Webhook = await Database.GetWebhook(body.group, body.key);
-    if (!Webhook) {
-        return response.status(400).send({
-            success: 'false',
-            message: "Webhook not found for given key"
-        }) 
-    }
-    console.log(Webhook);
-    let hook = new Discord.WebhookClient(Webhook.id, Webhook.token);
-    hook.send(body.message);
-})
-
 var port = process.env.PORT || 3333
 app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
 });
 
 //Starting discord bot
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
-
-const commandFiles = fs.readdirSync('./Commands').filter(file => file.endsWith('.js'));
-
-for (const file of commandFiles) {
-  const command = require(`./Commands/${file}`);
-  client.commands.set(command.name, command);
-}
+const client = new Commando.Client({
+    owner: '311395138133950465',
+    commandPrefix: prefix
+});
 
 async function AutoDetection() {
     setInterval(async function() {
@@ -136,7 +100,7 @@ async function AutoDetection() {
   }, 30*60*1000);
 }
 
-let AuditLogs = require('./Modules/AAWatcher')
+let AuditLogs = require('./Services/AAWatcher')
 client.once('ready', async function () {
     console.log('Ready');
     await AutoDetection();
@@ -150,34 +114,11 @@ client.once('ready', async function () {
     }
 });
 
-client.on('message', async function (message){
-  if (message.author.bot) return;
-  if (!message.content.startsWith(prefix)) return;
-
-  const args = message.content.slice(prefix.length).split(/ +/);
-  const commandName = args.shift().toLowerCase();
-
-  if (!client.commands.has(commandName)) return;
-  let Group = await Database.GetGroup(message.guild.id);
-  if (!Group) {
-      message.reply('No Roblox Group is linked to this guild');
-      return;
-  }
-  const command = client.commands.get(commandName);
-
-  if(command.guildOnly && !(message.channel.type === 'text')) {
-      message.reply('This command may only be executed in a server/guild.');
-      return;
-  }
-
-  try {
-      command.execute(message, args, client);
-  }
-  catch (error) {
-      console.error(error);
-      message.reply('There was an error trying to execute that command!');
-  }
-});
-
+client.registry
+    .registerGroups([
+        ['roblox', 'Roblox-Related Functions']
+    ])
+    .registerDefaults()
+    .registerCommandsIn(path.join(__dirname, 'commands'))
 
 client.login(token);
