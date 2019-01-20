@@ -4,9 +4,9 @@ const fs = require('fs')
 const cookieFile = './../cookie'
 var json = JSON.parse(fs.readFileSync('./cookie'))
 
-rbx.cookieLogin({cookie: json.cookie})
-.then(() => console.log('Logged into Roblox Account'))
-.catch(err => console.log(err.stack));
+// rbx.cookieLogin({cookie: json.cookie})
+// .then(() => console.log('Logged into Roblox Account'))
+// .catch(err => console.log(err.stack));
 
 async function GetGroupRank(RobloxId, GroupId) {
     let response = await fetch(`https://assetgame.roblox.com/Game/LuaWebService/HandleSocialRequest.ashx?method=GetGroupRank&playerid=${RobloxId}&groupid=${GroupId}`).then(); 

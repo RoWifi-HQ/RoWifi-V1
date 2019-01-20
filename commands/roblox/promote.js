@@ -1,8 +1,9 @@
-var Roblox = require('./../Utilities/Roblox')
-var Database = require('./../Utilities/Database')
+var Roblox = require('../../Utilities/Roblox')
+var Database = require('../../Utilities/Database')
 var rbx = require('noblox.js');
 var update = require('./update')
 var {Command} = require('discord.js-commando')
+const Discord = require('discord.js')
 
 function CheckPermission(member, PromoteMax) {
     if (member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
@@ -24,7 +25,7 @@ module.exports = class PromoteCommand extends Command{
             group: 'roblox',
             memberName: 'promote',
             description: 'Promotes a user in the Roblox Group',
-            guildOnly: false,
+            guildOnly: true,
         })
     }        
     async run(message, args) {
@@ -74,5 +75,11 @@ module.exports = class PromoteCommand extends Command{
         } else {
             message.reply('You do not have permission to promote this user');
         }
+    }
+
+    async hasPermission(message) {
+        let Group = await Database.GetGroup(message.guild.id);
+        let MaxRank = CheckPermission(message.member, Group.PromoteMax);
+        return MaxRank ? true : 'You do not have permission to use this command';
     }
 }

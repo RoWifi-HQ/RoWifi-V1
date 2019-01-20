@@ -1,6 +1,7 @@
-var Roblox = require('./../Utilities/Roblox')
-var Database = require('./../Utilities/Database')
+var Roblox = require('../../Utilities/Roblox')
+var Database = require('../../Utilities/Database')
 const {Command} = require('discord.js-commando');
+const Discord = require('discord.js')
 
 module.exports = class GetInfoCommand extends Command{
     constructor(client) {
@@ -9,7 +10,7 @@ module.exports = class GetInfoCommand extends Command{
             group: 'roblox',
             memberName: 'getinfo',
             description: 'Gets the Information regarding the user',
-            guildOnly: false,
+            guildOnly: true,
         })
     }
     async run (message) {

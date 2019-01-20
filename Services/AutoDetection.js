@@ -1,31 +1,22 @@
-const fetch = require('node-fetch');
-var Database = require('../Utilities/Database.js');
-const {Command} = require('discord.js-commando');
-let Roblox = require('./../Utilities/Roblox.js')
+const Database = require('./../Utilities/Database');
+const Roblox = require('../Utilities/Roblox')
 
-module.exports = class UpdateCommand extends Command {
-    constructor(client) {
-        super(client, {
-            name: 'update',
-            group: 'roblox',
-            memberName: 'update',
-            description: 'Update Guild Roles',
-            guildOnly: true
-        })
-    }        
-    async run(message){
-        let embed = new Discord.RichEmbed()
-        .setTitle('Update Process')
-        .setTimestamp()
-        .setFooter('tensor_core');
-        //if (message.member.permissions.has('ADMINISTRATOR')) return;
-        let arg = message.guild.member(message.mentions.users.first()) || message.member;
+async function AutoDetection(guild) {
+    let Group = await Database.GetGroup(guild.id);
+    let Subgroups = Group.Subgroups;
+    let Remove = Group['AllBinds'];
+    if (!Group.AutoDetection) {
+        return;
+    }
+    for (let member of guild.members) {
+        if (member[1].user.bot || member[1].roles.has(guild.roles.find(r => r.name === "tensor_core Bypass").id)) {
+            continue;
+        }
+        let arg = member[1];
         let roles = arg.roles;
+        console.log(arg.id);
         let User = await Database.GetUser(arg.id);
         console.log(User);
-        let Group = await Database.GetGroup(message.guild.id);
-        let Remove = Group['AllBinds'];
-        let Subgroups = Group.Subgroups
         if(User) {
             let Rank = await Roblox.GetGroupRank(User.RobloxId, Group.GroupId);
             if (Rank > 0) {
@@ -73,4 +64,6 @@ module.exports = class UpdateCommand extends Command {
             await arg.addRole(Group.VerificationRole);
         }
     }
-}    
+}
+
+exports.execute = AutoDetection

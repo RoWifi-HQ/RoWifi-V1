@@ -1,7 +1,8 @@
-let Database = require('./../Utilities/Database.js');
+let Database = require('../../Utilities/Database.js');
 const { Command } = require('discord.js-commando');
 let codeWords = ['cat', 'dog', 'sun', 'rain', 'snow', 'alcazar', 'dight', 'night', 'morning', 'eyewater', 'flaws', 'physics', 'chemistry', 'history', 'martlet', 'nagware', 'coffee', 'tea', 'red', 'blue', 'green', 'orange', 'pink'];
-let Roblox = require('./../Utilities/Roblox.js')
+let Roblox = require('../../Utilities/Roblox.js');
+const Discord = require('discord.js')
 
 module.exports = class VerifyCommand extends Command {
   constructor(client) {
