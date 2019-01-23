@@ -110,4 +110,18 @@ async function GetWebhook(GroupId, key) {
     })
 }
 
-module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook}
+async function ModifyUser(DiscordId, newRobloxId) {
+    return new Promise(async function (resolve, reject) {
+        let user = await GetUser(DiscordId);
+        user.RobloxId = newRobloxId;
+        users.insert(user, function (err, result) {
+            if (err) {
+                console.log(err);
+                resolve(false);
+            }
+            resolve(true);
+        })
+    })
+}
+
+module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook, ModifyUser}
