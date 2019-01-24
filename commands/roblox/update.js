@@ -73,5 +73,6 @@ module.exports = class UpdateCommand extends Command {
             await arg.removeRoles(Remove).catch(err => console.log(err));
             await arg.addRole(Group.VerificationRole);
         }
+        return await message.channel.send('Updated successfully');
     }
 }    

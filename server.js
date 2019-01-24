@@ -45,7 +45,7 @@ client.once('ready', async function () {
         AuditLogs.WatchAA(guild[1]);
         setInterval(async function () {
             await AutoDetection.execute(guild[1]);
-        }, 30*60, 1000)
+        }, 30*60*1000)
     }
 });
 
