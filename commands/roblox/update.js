@@ -31,11 +31,11 @@ module.exports = class UpdateCommand extends Command {
             let Rank = await Roblox.GetGroupRank(User.RobloxId, Group.GroupId);
             if (Rank > 0) {
                 let Bind = Group.RankBinds[Rank];
+                console.log(Rank, Bind);
                 if (!Bind) {
                     return;
                 }
                 for (let i = 0; i < Remove.length; i++ ) {
-                    console.log(Remove[i])
                     if (Bind.RoleBinds.includes(Remove[i])) {
                         if (!roles.has(Remove[i])) 
                             await arg.addRole(Remove[i]).catch(err => console.log(err));
