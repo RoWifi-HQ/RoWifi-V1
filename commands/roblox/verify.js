@@ -16,7 +16,7 @@ module.exports = class VerifyCommand extends Command {
       args: [
         {
           key: 'name',
-          prompt: 'Roblox Name missing. Try again',
+          prompt: 'Enter your Roblox name.',
           type: 'string'
         }
       ]

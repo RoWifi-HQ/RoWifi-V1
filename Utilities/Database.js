@@ -77,6 +77,18 @@ async function AddUser(DiscordId, RobloxId) {
     })
 }
 
+async function AddGuild(GuildId) {
+    let guild = {"_id": GuildId}
+    return new Promise(function(resolve, reject) {
+        guilds.insert(guild, function(err, result) {
+            if (err) {
+                resolve(false);
+            }
+            resolve(true);
+        })
+    })
+}
+
 async function AddUsers(Ids) {
     return new Promise(function(resolve, reject) {
         users.bulk({docs:Ids}, function(err, result) {
@@ -124,4 +136,18 @@ async function ModifyUser(DiscordId, newRobloxId) {
     })
 }
 
-module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook, ModifyUser}
+async function ModifyRobloxGroup(GuildId, NewRobloxId) {
+    return new Promise(async function(resolve, reject) {
+        let guild = await GetGroup(GuildId);
+        guild.GroupId = NewRobloxId;
+        guilds.insert(guild, function (err, result) {
+            if (err) {
+                console.log(err);
+                resolve(false);
+            }
+            resolve(true);
+        })
+    })
+}
+
+module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook, ModifyUser, AddGuild, ModifyRobloxGroup}

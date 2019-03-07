@@ -1,14 +1,11 @@
 var express = require("express");
 var app = express();
 var bodyParser = require('body-parser')
-var fs = require('fs')
 var Database = require('./Utilities/Database.js');
-var Roblox = require('./Utilities/Roblox')
-var fetch = require('node-fetch')
-var rbx = require('noblox.js');
 var Commando = require('discord.js-commando');
 var { prefix, token } = require('./config.json');
 var path = require('path');
+var Logger = require('./Modules/LogService');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -42,7 +39,7 @@ client.once('ready', async function () {
         if (!Group) {
             continue;
         }
-        AuditLogs.WatchAA(guild[1]);
+        //AuditLogs.WatchAA(guild[1]);
         setInterval(async function () {
             await AutoDetection.execute(guild[1]);
         }, 30*60*1000)
@@ -50,6 +47,11 @@ client.once('ready', async function () {
 });
 
 client.on('error', console.error);
+
+client.on('guildCreate', async function(guild) {
+    await Database.AddGuild(guild.id);
+    await Logger.Log("Bot added to " + guild.name);
+})
 
 client.registry
     .registerGroups([
