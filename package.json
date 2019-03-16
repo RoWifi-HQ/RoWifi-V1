@@ -15,11 +15,9 @@
     "url": "https://github.com/IBM-Cloud/get-started-node"
   },
   "dependencies": {
-    "@cloudant/cloudant": "^2.4.1",
-    "body-parser": "^1.18.3",
-    "cfenv": "^1.1.0",
-    "discord.js": "^11.4.2",
-    "discord.js-commando": "^0.10.0",
+    "@cloudant/cloudant": "^3.0.2",
+    "body-parser": "^1.17.x",
+    "cfenv": "^1.0.x",
     "dotenv": "^4.0.0",
     "express": "^4.16.4",
     "noblox.js": "^4.1.3",
