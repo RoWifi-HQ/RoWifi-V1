@@ -13,7 +13,8 @@ module.exports = class SetGroupCommand extends Command {
             args: [
                 {
                     key: 'groupId',
-                    prompt: 'Enter the Id of the Roblox Group you wish to bind to this server'
+                    prompt: 'Enter the Id of the Roblox Group you wish to bind to this server',
+                    type: 'string'
                 }
             ]
         })
