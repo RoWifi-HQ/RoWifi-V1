@@ -11,15 +11,18 @@ const Task = {
  * @param {string} service Service Name
  * @param {Discord.GuildChannel} channel Channel for the embed to be sent to
  * @param {string} status Status of the task
- * @param {*} fields Text to be sent 
+ * @param {Array} fields Text to be sent 
  */
-async function SendEmbed(service, channel, status, fields) {
+function EmbedMessage(service, status, fields) {
     let embed = new Discord.RichEmbed()
         .setTitle(service)
         .setTimestamp()
         .setFooter('tensor_core')
-        .setColor(Task[success])
-    channel.send('', embed)
-}
+        .setColor(Task[status])
+    for (let field of fields) {
+        embed.addField(field.name, field.value)
+    }
+    return embed
+}     
 
-module.exports = {SendEmbed}
+module.exports = {EmbedMessage}

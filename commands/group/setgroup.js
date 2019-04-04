@@ -1,6 +1,7 @@
 const {Command} = require('discord.js-commando')
 let Roblox = require('./../../Utilities/Roblox')
 let Database = require('./../../Utilities/Database')
+let Extensions = require('../../Utilities/DiscordExtensions')
 
 module.exports = class SetGroupCommand extends Command {
     constructor(client) {
@@ -13,7 +14,7 @@ module.exports = class SetGroupCommand extends Command {
             args: [
                 {
                     key: 'groupId',
-                    prompt: 'Enter the Id of the Roblox Group you wish to bind to this server',
+                    prompt: 'Enter the Id of the Roblox Group you wish to bind to this server.\n',
                     type: 'string'
                 }
             ]
@@ -29,9 +30,21 @@ module.exports = class SetGroupCommand extends Command {
         if (!Group) {
             return message.send("Group does not exist");
         }
-        let success = await Database.ModifyRobloxGroup(message.guild.id, Group.Id)
+        Group.GroupId = groupId
+        let success = await Database.SaveGuild(message.guild.id, Group)
         if (success) {
-            
+            return message.channel.send("", Extensions.EmbedMessage("Group Service", "Success", 
+                [
+                    {name: "Success", value: `Guild has successfully been linked to ${Group.Name}`}
+                ]
+            ))
+        }
+        else {
+            return message.channel.send("", Extensions.EmbedMessage("Group Service", "Failure", 
+                [
+                    {name: "Failure", value: `There has been an error in adding ${Group.Name}. Please try again. If the error persists, please contact @Gautam.A#9539.`}
+                ]
+            ))
         }
     }
 }

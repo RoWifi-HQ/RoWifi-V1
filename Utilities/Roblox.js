@@ -47,11 +47,14 @@ async function GetGroupRole(RobloxId, GroupId) {
     return data;     
 }
 
-async function GetGroup(RobloxId) {
+async function GetGroup(RobloxId, field) {
     let response = await fetch(`https://api.roblox.com/groups/${RobloxId}`)
     if (response.status != 200) {return false;}
     let data = await response.text();
-    return data;     
+    if (field) {
+        return data[field]
+    }
+    return data;    
 }
 
 module.exports = {GetGroupRank, GetRobloxId, CheckForCode, GetRobloxName, GetGroup, GetGroupRole}

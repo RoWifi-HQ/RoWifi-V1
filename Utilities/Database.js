@@ -136,10 +136,8 @@ async function ModifyUser(DiscordId, newRobloxId) {
     })
 }
 
-async function ModifyRobloxGroup(GuildId, NewRobloxId) {
+async function SaveGuild(GuildId, guild) {
     return new Promise(async function(resolve, reject) {
-        let guild = await GetGroup(GuildId);
-        guild.GroupId = NewRobloxId;
         guilds.insert(guild, function (err, result) {
             if (err) {
                 console.log(err);
@@ -150,4 +148,4 @@ async function ModifyRobloxGroup(GuildId, NewRobloxId) {
     })
 }
 
-module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook, ModifyUser, AddGuild, ModifyRobloxGroup}
+module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook, ModifyUser, AddGuild, SaveGuild}
