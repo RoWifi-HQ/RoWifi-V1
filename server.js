@@ -34,19 +34,28 @@ let AutoDetection = require('./Services/AutoDetection')
 client.once('ready', async function () {
     console.log('Ready');
     let guilds = client.guilds;
+    //guilds.find(g => g.id == "116394307014885379").leave().catch(err => console.log(err));
     for (let guild of guilds) {
+        console.log(guild[0])
         let Group = await Database.GetGroup(guild[1].id);
         if (!Group) {
             continue;
         }
         //AuditLogs.WatchAA(guild[1]);
-        setInterval(async function () {
-            await AutoDetection.execute(guild[1]);
-        }, 30*60*1000)
+        // setInterval(async function () {
+             await AutoDetection.execute(guild[1]);
+        // }, 30*60*1000)
     }
 });
 
 client.on('error', console.error);
+
+client.on('message', async function (msg) {
+    if (msg.channel.id == "499293823151767552") {
+        let embed = message.embeds[0].fields
+        console.log(embed)
+    }
+})
 
 client.on('guildCreate', async function(guild) {
     await Database.AddGuild(guild.id);
@@ -58,6 +67,8 @@ client.registry
         ['roblox', 'Roblox-Related Functions'],
         ['group', 'Group Administration Functions'],
         ['math', 'Math Functions']
+        ['moderation', 'Moderation Commands'],
+        ['owner', 'Owner-Only or Alpha Modules']
     ])
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, 'commands'))

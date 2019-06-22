@@ -1,7 +1,7 @@
 var cfenv = require("cfenv");
 
 // load local VCAP configuration  and service credentials
-var vcapLocal, cloudant, users, guilds;
+var vcapLocal, cloudant, users, guilds, xps;
 
 try {
     vcapLocal = require('./../vcap-local.json');
@@ -31,6 +31,7 @@ if(cloudant) {
     // Specify the database we are going to use (mydb)...
     users = cloudant.db.use('users');
     guilds = cloudant.db.use('guilds');
+    xps = cloudant.db.use('xp');
 }
 
 /**
@@ -148,4 +149,32 @@ async function SaveGuild(GuildId, guild) {
     })
 }
 
-module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook, ModifyUser, AddGuild, SaveGuild}
+/**
+ * 
+ * @param {string} RobloxId User Roblox Id
+ */
+function GetXP(RobloxId) {
+    return new Promise(function(resolve, reject) {
+        xps.get(RobloxId, (err, body) => {
+            if (err) {
+                //console.log(err);
+                resolve(null);
+            }
+            resolve(body);
+        }); 
+    })
+}
+
+function SaveXP(XPUser) {
+    return new Promise(async function (resolve, reject) {
+        xps.insert(XPUser, function (err, result) {
+            if (err) {
+                console.log(err);
+                resolve(false);
+            }
+            resolve(true);
+        })
+    })
+}
+
+module.exports = {GetUser, GetGroup, AddUser, AddUsers, GetWebhook, ModifyUser, AddGuild, SaveGuild, GetXP, SaveXP}

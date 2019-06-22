@@ -1,0 +1,3 @@
+This is my take on a Roblox-Discord Verification bot. It's not very optimised and highly unefficient. But this was my first attempt in undertaking such a project. From a beginner's point of view, I think I did a pretty good job in setting up all this infrastructure.
+
+NOTE: This project is no longer maintained. I have rewritten this bot in another language and I wish to share my mistakes with the world and as a result, help others avoid them.
